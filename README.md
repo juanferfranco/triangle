@@ -1,1 +1,1 @@
-# openglTemplate
+# Hello world openGL
