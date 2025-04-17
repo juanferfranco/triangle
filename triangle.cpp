@@ -98,7 +98,6 @@ void setupTriangle() {
 
 int main()
 {
-
 	// 1) Inicializar GLFW
 	if (!glfwInit()) {
 		std::cerr << "Fallo al inicializar GLFW\n";
@@ -116,42 +115,61 @@ int main()
 		return -1;
 	}
 
-	// 3) Cargar GLAD y recursos en contexto de window1
+	// 3) Lee el tamaño del framebuffer
+	int bufferWidth, bufferHeight;
+	glfwGetFramebufferSize(mainWindow, &bufferWidth, &bufferHeight);
+	
+	// 4) Callbacks 
+	glfwSetFramebufferSizeCallback(mainWindow, framebuffer_size_callback);
+
+
+	// 5) Cargar GLAD y recursos en contexto de window1
 	glfwMakeContextCurrent(mainWindow);
 
 	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
 		std::cerr << "Fallo al cargar GLAD (contexto1)\n";
 		return -1;
 	}
+
+	// 6) Habilita el V-Sync
+	glfwSwapInterval(1);
+
+	// 7) Compila y linkea shaders
 	shaderProg = buildShaderProgram();
+
+	// 8) Genera el contenido a mostrar
 	setupTriangle();
 
-	// 4) Callbacks y VSync
-	glfwSetFramebufferSizeCallback(mainWindow, framebuffer_size_callback);
-	glfwMakeContextCurrent(mainWindow); glfwSwapInterval(1);
-
-
-	// 5) Define el viewport
-	int bufferWidth, bufferHeight;
-	glfwGetFramebufferSize(mainWindow, &bufferWidth, &bufferHeight);
+	// 9) Configura el viewport
 	glViewport(0, 0, bufferWidth, bufferHeight);
 
-	// 6) Loop principal
+
+	// 10) Loop principal
 	while (!glfwWindowShouldClose(mainWindow))
 	{
+		// 11) Manejo de eventos
 		glfwPollEvents();
 
-		// --- Render ventana ---
-		glfwMakeContextCurrent(mainWindow);
+	
+		// 12) Procesa la entrada
 		processInput(mainWindow);
+
+		// 13) Configura el color de fondo y limpia el framebuffer
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
+		
+		// 14) Indica a OpenGL que use el shader program
 		glUseProgram(shaderProg);
+
+		// 15) Activa el VAO y dibuja el triángulo
 		glBindVertexArray(VAO);
 		glDrawArrays(GL_TRIANGLES, 0, 3);
+
+		// 16) Intercambia buffers y muestra el contenido
 		glfwSwapBuffers(mainWindow);
 	}
-	// 7) Limpieza
+
+	// 17) Limpieza
 	glfwMakeContextCurrent(mainWindow);
 	glDeleteVertexArrays(1, &VAO);
 	glDeleteBuffers(1, &VBO);
